@@ -10,11 +10,11 @@ services:
         PYTORCH_VERSION: ${PYTORCH_VERSION:-2.4.1}
         COMFYUI_BUILD_REF: ${COMFYUI_BUILD_REF:-}
         # Base on Python image which is base + python + jupyter
-        IMAGE_BASE: ${IMAGE_BASE:-ghcr.io/ai-dock/python:${PYTHON_VERSION:-3.10}-v2-cuda-12.1.1-base-22.04}
+        IMAGE_BASE: ${IMAGE_BASE:-ghcr.io/ai-dock/comfyui:v2-cpu-22.04}
       tags:
-        - "ghcr.io/ai-dock/comfyui:${IMAGE_TAG:-pytorch-${PYTORCH_VERSION:-2.3.0}-py3.10-v2-cuda-12.1.1-base-22.04}"
+        - "ghcr.io/ai-dock/comfyui:${IMAGE_TAG:-v2-cpu-22.04}"
         
-    image: ghcr.io/ai-dock/comfyui:${IMAGE_TAG:-pytorch-${PYTORCH_VERSION:-2.3.0}-py3.10-v2-cuda-12.1.1-base-22.04}
+    image: ghcr.io/ai-dock/comfyui:${IMAGE_TAG:-v2-cpu-22.04}
     
     ## For Nvidia GPU's - You probably want to uncomment this
     #deploy:
@@ -33,14 +33,14 @@ services:
               
     volumes:
       ## Workspace
-      - ./workspace:${WORKSPACE:-/workspace/}:rshared
+      - ~/workspace:${WORKSPACE:-/workspace/}:rshared
       # You can share /workspace/storage with other non-ComfyUI containers. See README
       #- /path/to/common_storage:${WORKSPACE:-/workspace/}storage/:rshared
       
       # Will echo to root-owned authorized_keys file;
       # Avoids changing local file owner
-      - ./config/authorized_keys:/root/.ssh/authorized_keys_mount
-      #- ./config/provisioning/default.sh:/opt/ai-dock/bin/provisioning.sh
+      - ~/.ssh/authorized_keys:/root/.ssh/authorized_keys_mount
+      - ~/src/comfyui/config/provisioning/default.sh:/opt/ai-dock/bin/provisioning.sh
       # In-container development
       - ./build/COPY_ROOT_1/opt/ai-dock/api-wrapper:/opt/ai-dock/api-wrapper
     ports:
@@ -64,7 +64,7 @@ services:
         - WORKSPACE=${WORKSPACE:-/workspace}
         - WORKSPACE_SYNC=${WORKSPACE_SYNC:-false}
         - CF_TUNNEL_TOKEN=${CF_TUNNEL_TOKEN:-}
-        - CF_QUICK_TUNNELS=${CF_QUICK_TUNNELS:-true}
+        - CF_QUICK_TUNNELS=${CF_QUICK_TUNNELS:-false}
         - CIVITAI_TOKEN=${CIVITAI_TOKEN:-}
         - HF_TOKEN=${HF_TOKEN:-}
         - WEB_ENABLE_AUTH=${WEB_ENABLE_AUTH:-true}
@@ -86,4 +86,4 @@ services:
         - SYNCTHING_UI_PORT_HOST=${SYNCTHING_UI_PORT_HOST:-8384}
         - SYNCTHING_TRANSPORT_PORT_HOST=${SYNCTHING_TRANSPORT_PORT_HOST:-22999}
         - SYNCTHING_URL=${SYNCTHING_URL:-}
-        #- PROVISIONING_SCRIPT=${PROVISIONING_SCRIPT:-}
+        - PROVISIONING_SCRIPT=${PROVISIONING_SCRIPT:-}
